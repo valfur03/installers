@@ -2,9 +2,10 @@ FROM ubuntu
 
 RUN set -eux; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends sudo
+	apt-get install -y --no-install-recommends ca-certificates sudo curl git \
+												vim zsh
 
 WORKDIR /usr/src
-COPY debian-installer-v1.sh .
+COPY install.sh .
 
-CMD [ "./debian-installer-v1.sh" ]
+CMD [ "./install.sh" ]

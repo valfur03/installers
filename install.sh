@@ -9,11 +9,7 @@ YELLOW="\033[33m"
 BLUE="\033[34m"
 MAGENTA="\033[35m"
 
-# Options
-# 
-# g, gnome -> Gnome
-# k, kde-plasma -> KDE
-# x, xfce -> xfce
+#set -ux;
 
 print_usage()
 {
@@ -29,10 +25,43 @@ set_desktop()
 	then
 		DESKTOP=$1
 	else
-		echo "Desktop environment already set to '$DESKTOP'" 1>&2
+		printf "${RED}Desktop environment already set to '%s'${NC}\n" $DESKTOP 1>&2
 		exit 1
 	fi
 }
+
+check_commands_exist()
+{
+	missing_command=0
+	while [ $# -gt 0 ]
+	do
+		if ! command -v $1 > /dev/null 2>&1
+		then
+			printf "${RED}'%s' is not installed...${NC}\n" $1
+			missing_command=1
+		fi
+		shift 1;
+	done
+	[ $missing_command -gt 0 ] && exit 1
+}
+check_commands_exist 'grep' 'curl' 'git' 'vim' 'mkdir'
+
+command_summary()
+{
+	if [ $1 -eq 0 ]
+	then
+		printf "${GREEN}%-70s installed${NC}\n" "$2"
+	else
+		printf "${YELLOW}%-57s installation failed...\n${NC}" "$2"
+		[ -r .last-output ] && cat .last-output
+	fi
+}
+
+# Options
+# 
+# g, gnome -> Gnome
+# k, kde-plasma -> KDE
+# x, xfce -> xfce
 
 while getopts ":gkx" opt
 do
@@ -47,15 +76,14 @@ do
 		set_desktop "xfce"
 		;;
 	\?)
-		echo "Invalid Option: -$OPTARG" 1>&2
+		printf "${RED}Invalid Option: -%s${NC}\n" $OPTARG 1>&2
 		print_usage
 		;;
 	:)
-		echo "Invalid Option: -$OPTARG requires an argument" 1>&2
+		printf "${RED}Invalid Option: -%s requires an argument${NC}\n" $OPTARG 1>&2
 		print_usage
 		;;
 	esac
-	echo $DESKTOP
 done
 shift $((OPTIND -1))
 
@@ -65,7 +93,7 @@ then
 	distribution=$(grep -E '^(ID)=' /etc/os-release | cut -d '=' -f 2)
 	if [ -z $distribution ]
 	then
-		printf "Your ditribution does not seem to be supported...\n"
+		printf "${RED}Your ditribution does not seem to be supported...${NC}\n"
 		exit 1
 	fi
 fi
@@ -73,29 +101,32 @@ if [ "$distribution" = "debian" ]
 then
 	package_manager="apt-get"
 else
-	printf "Your ditribution does not seem to be supported...\n"
+	printf "${RED}Your ditribution does not seem to be supported...${NC}\n"
 	exit 1
 fi
 
 # Install oh-my-zsh
-if command -v curl > /dev/null 2>&1
-then
-	yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" "--unattended"
-	if [ $? -ne 0 ]
-	then
-		printf "${RED}oh-my-zsh installation failed, aborting...\n${NC}"
-		exit 1
-	fi
-fi
+yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" "--unattended" > .last-output 2>&1
+command_summary $? 'oh-my-zsh'
 
 # Configure VIM
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-curl -o ~/.vimrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.vimrc
-vim +PluginInstall +qall
-mkdir -p ~/.vim/plugin/ftdetect
-echo 'au BufNewFile,BufRead *.c set cindent' >> ~/.vim/plugin/ftdetect/c.vim
+git clone https://github.com/VundleVim/Vundle.vim.git \
+	~/.vim/bundle/Vundle.vim > .last-output 2>&1
+command_summary $? 'vundle (VIM plugin manager)'
+curl -o ~/.vimrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.vimrc > .last-output 2>&1
+command_summary $? '.vimrc'
+vim +PluginInstall +qall > .last-output 2>&1
+command_summary $? 'vundle plugins'
+mkdir -p ~/.vim/plugin/ftdetect > .last-output 2>&1
+echo 'au BufNewFile,BufRead *.c set cindent' >> ~/.vim/plugin/ftdetect/c.vim > .last-output 2>&1
+command_summary $? 'ftdetect c'
 
 # Configure zsh
-curl -o ~/.zshrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zshrc
-curl -o ~/.zsh_aliases https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zsh_aliases
-curl -o ~/.oh-my-zsh/themes/custom.zsh-theme https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/custom.zsh-theme
+curl -o ~/.zshrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zshrc > .last-output 2>&1
+command_summary $? '.zshrc'
+curl -o ~/.zsh_aliases https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zsh_aliases > .last-output 2>&1
+command_summary $? '.zsh_aliases'
+curl -o ~/.oh-my-zsh/themes/custom.zsh-theme https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/custom.zsh-theme > .last-output 2>&1
+command_summary $? 'custom.zsh-theme'
+
+rm -f .last-output
