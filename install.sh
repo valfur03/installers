@@ -44,7 +44,7 @@ check_commands_exist()
 	done
 	[ $missing_command -gt 0 ] && exit 1
 }
-check_commands_exist 'grep' 'curl' 'git' 'vim' 'mkdir'
+check_commands_exist 'grep' 'id' 'curl' 'git' 'vim' 'mkdir'
 
 command_summary()
 {
@@ -99,9 +99,28 @@ fi
 
 if [ $FULL_INSTALL -gt 0 ]
 then
+	if [ $(id -u) -ne 0 ]
+	then
+		SUDO=""
+		if sudo -p '[sudo] password for %u (^D for cancel): ' -v
+		then
+			SUDO="sudo"
+		else
+			FULL_INSTALL=0
+			printf "${YELLOW}We cannot install the packages because you do not have root permissions...${NC}\n"
+		fi
+	fi
+fi
+
+if [ $FULL_INSTALL -gt 0 ]
+then
 	case $distribution in
+	"arch")
+		$SUDO pacman -S --noconfirm --noprogressbar --quiet $(curl -fsSL https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/arch-packages.txt)
+		;;
 	"debian")
-		package_manager="apt-get"
+		DEBIAN_FRONTEND=noninteractive 
+		$SUDO apt-get install -y --no-install-recommends $(curl -fsSL https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/debian-packages.txt)
 		;;
 	*)
 		printf "${RED}Your ditribution does not seem to be supported...${NC}\n"
@@ -118,7 +137,7 @@ command_summary $? 'oh-my-zsh'
 git clone https://github.com/VundleVim/Vundle.vim.git \
 	~/.vim/bundle/Vundle.vim > .last-output 2>&1
 command_summary $? 'vundle (VIM plugin manager)'
-curl -o ~/.vimrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.vimrc > .last-output 2>&1
+curl -fsSL -o ~/.vimrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.vimrc > .last-output 2>&1
 command_summary $? '.vimrc'
 vim +PluginInstall +qall > .last-output 2>&1
 command_summary $? 'vundle plugins'
@@ -127,15 +146,17 @@ echo 'au BufNewFile,BufRead *.c set cindent' >> ~/.vim/plugin/ftdetect/c.vim > .
 command_summary $? 'ftdetect c'
 
 # Configure zsh
-curl -o ~/.zshrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zshrc > .last-output 2>&1
+curl -fsSL -o ~/.zshrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zshrc > .last-output 2>&1
 command_summary $? '.zshrc'
-curl -o ~/.zsh_aliases https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zsh_aliases > .last-output 2>&1
+curl -fsSL -o ~/.zsh_aliases https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zsh_aliases > .last-output 2>&1
 command_summary $? '.zsh_aliases'
-curl -o ~/.oh-my-zsh/themes/custom.zsh-theme https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/custom.zsh-theme > .last-output 2>&1
+mkdir -p ~/.oh-my-zsh/themes
+curl -fsSL -o ~/.oh-my-zsh/themes/custom.zsh-theme https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/custom.zsh-theme > .last-output 2>&1
 command_summary $? 'custom.zsh-theme'
 
 # Configure Terminator
-curl -o ~/.config/terminator/config https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/terminator-config > .last-output 2>&1
+mkdir -p ~/.config/terminator
+curl -fsSL -o ~/.config/terminator/config https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/terminator-config > .last-output 2>&1
 command_summary $? 'terminator config'
 
 rm -f .last-output
