@@ -63,9 +63,13 @@ command_summary()
 # k, kde-plasma -> KDE
 # x, xfce -> xfce
 
-while getopts ":gkx" opt
+FULL_INSTALL=0
+while getopts ":fgkx" opt
 do
 	case $opt in
+	f|full)
+		FULL_INSTALL=1
+		;;
 	g|gnome)
 		set_desktop "gnome"
 		;;
@@ -88,21 +92,22 @@ done
 shift $((OPTIND -1))
 
 distribution=$(grep -E '^(ID_LIKE)=' /etc/os-release | cut -d '=' -f 2)
-if [ -z $distribution ]
+if [ -z "$distribution" ]
 then
 	distribution=$(grep -E '^(ID)=' /etc/os-release | cut -d '=' -f 2)
-	if [ -z $distribution ]
-	then
+fi
+
+if [ $FULL_INSTALL -gt 0 ]
+then
+	case $distribution in
+	"debian")
+		package_manager="apt-get"
+		;;
+	*)
 		printf "${RED}Your ditribution does not seem to be supported...${NC}\n"
 		exit 1
-	fi
-fi
-if [ "$distribution" = "debian" ]
-then
-	package_manager="apt-get"
-else
-	printf "${RED}Your ditribution does not seem to be supported...${NC}\n"
-	exit 1
+		;;
+	esac
 fi
 
 # Install oh-my-zsh
@@ -128,5 +133,9 @@ curl -o ~/.zsh_aliases https://gist.githubusercontent.com/valfur03/f49e289c6f0b3
 command_summary $? '.zsh_aliases'
 curl -o ~/.oh-my-zsh/themes/custom.zsh-theme https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/custom.zsh-theme > .last-output 2>&1
 command_summary $? 'custom.zsh-theme'
+
+# Configure Terminator
+curl -o ~/.config/terminator/config https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/terminator-config > .last-output 2>&1
+command_summary $? 'terminator config'
 
 rm -f .last-output
