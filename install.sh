@@ -152,8 +152,6 @@ command_summary $? 'ftdetect c'
 # Configure zsh
 curl -fsSL -o ~/.zshrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zshrc > .last-output 2>&1
 command_summary $? '.zshrc'
-curl -fsSL -o ~/.zsh_aliases https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zsh_aliases > .last-output 2>&1
-command_summary $? '.zsh_aliases'
 mkdir -p ~/.oh-my-zsh/themes
 curl -fsSL -o ~/.oh-my-zsh/themes/custom.zsh-theme https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/custom.zsh-theme > .last-output 2>&1
 command_summary $? 'custom.zsh-theme'
