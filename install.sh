@@ -117,10 +117,14 @@ then
 	case $distribution in
 	"arch")
 		$SUDO pacman -S --noconfirm --noprogressbar --quiet $(curl -fsSL https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/arch-packages.txt)
+		$SUDO systemctl enable docker
+		$SUDO systemctl start docker
 		;;
 	"debian")
 		DEBIAN_FRONTEND=noninteractive 
 		$SUDO apt-get install -y --no-install-recommends $(curl -fsSL https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/debian-packages.txt)
+		$SUDO systemctl enable docker
+		$SUDO systemctl start docker
 		;;
 	*)
 		printf "${RED}Your ditribution does not seem to be supported...${NC}\n"
