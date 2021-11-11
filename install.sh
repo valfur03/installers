@@ -91,23 +91,28 @@ do
 done
 shift $((OPTIND -1))
 
-distribution=$(grep -E '^(ID_LIKE)=' /etc/os-release | cut -d '=' -f 2)
-if [ -z "$distribution" ]
+if [[ "$OSTYPE" == "darwin"* ]]
 then
-	distribution=$(grep -E '^(ID)=' /etc/os-release | cut -d '=' -f 2)
-fi
-
-if [ $FULL_INSTALL -gt 0 ]
-then
-	if [ $(id -u) -ne 0 ]
+	distribution="macos"
+else
+	distribution=$(grep -E '^(ID_LIKE)=' /etc/os-release | cut -d '=' -f 2)
+	if [ -z "$distribution" ]
 	then
-		SUDO=""
-		if sudo -p '[sudo] password for %u (^D for cancel): ' -v
+		distribution=$(grep -E '^(ID)=' /etc/os-release | cut -d '=' -f 2)
+	fi
+	
+	if [ $FULL_INSTALL -gt 0 ]
+	then
+		if [ $(id -u) -ne 0 ]
 		then
-			SUDO="sudo"
-		else
-			FULL_INSTALL=0
-			printf "${YELLOW}We cannot install the packages because you do not have root permissions...${NC}\n"
+			SUDO=""
+			if sudo -p '[sudo] password for %u (^D for cancel): ' -v
+			then
+				SUDO="sudo"
+			else
+				FULL_INSTALL=0
+				printf "${YELLOW}We cannot install the packages because you do not have root permissions...${NC}\n"
+			fi
 		fi
 	fi
 fi
