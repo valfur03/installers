@@ -138,6 +138,10 @@ then
 	esac
 fi
 
+# bashrc
+curl -fsSL -o ~/.bashrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.bashrc > .last-output 2>&1
+command_summary $? '.bashrc'
+
 # Install oh-my-zsh
 yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" "--unattended" > .last-output 2>&1
 command_summary $? 'oh-my-zsh'
