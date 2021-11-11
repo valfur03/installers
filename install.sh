@@ -139,7 +139,7 @@ then
 fi
 
 # bashrc
-curl -fsSL -o ~/.bashrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.bashrc > .last-output 2>&1
+curl -fsSL -o $HOME/.bashrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.bashrc > .last-output 2>&1
 command_summary $? '.bashrc'
 
 # Install oh-my-zsh
@@ -148,26 +148,26 @@ command_summary $? 'oh-my-zsh'
 
 # Configure VIM
 git clone https://github.com/VundleVim/Vundle.vim.git \
-	~/.vim/bundle/Vundle.vim > .last-output 2>&1
+	$HOME/.vim/bundle/Vundle.vim > .last-output 2>&1
 command_summary $? 'vundle (VIM plugin manager)'
-curl -fsSL -o ~/.vimrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.vimrc > .last-output 2>&1
+curl -fsSL -o $HOME/.vimrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.vimrc > .last-output 2>&1
 command_summary $? '.vimrc'
 vim +PluginInstall +qall > .last-output 2>&1
 command_summary $? 'vundle plugins'
-mkdir -p ~/.vim/plugin/ftdetect > .last-output 2>&1
-echo 'au BufNewFile,BufRead *.c set cindent' >> ~/.vim/plugin/ftdetect/c.vim > .last-output 2>&1
+mkdir -p $HOME/.vim/plugin/ftdetect > .last-output 2>&1
+echo 'au BufNewFile,BufRead *.c set cindent' >> $HOME/.vim/plugin/ftdetect/c.vim > .last-output 2>&1
 command_summary $? 'ftdetect c'
 
 # Configure zsh
-curl -fsSL -o ~/.zshrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zshrc > .last-output 2>&1
+curl -fsSL -o $HOME/.zshrc https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/.zshrc > .last-output 2>&1
 command_summary $? '.zshrc'
-mkdir -p ~/.oh-my-zsh/themes
-curl -fsSL -o ~/.oh-my-zsh/themes/custom.zsh-theme https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/custom.zsh-theme > .last-output 2>&1
+mkdir -p $HOME/.oh-my-zsh/themes
+curl -fsSL -o $HOME/.oh-my-zsh/themes/custom.zsh-theme https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/custom.zsh-theme > .last-output 2>&1
 command_summary $? 'custom.zsh-theme'
 
 # Configure Terminator
-mkdir -p ~/.config/terminator
-curl -fsSL -o ~/.config/terminator/config https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/terminator-config > .last-output 2>&1
+mkdir -p $HOME/.config/terminator
+curl -fsSL -o $HOME/.config/terminator/config https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/terminator-config > .last-output 2>&1
 command_summary $? 'terminator config'
 
 rm -f .last-output
