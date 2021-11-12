@@ -178,15 +178,19 @@ then
 	printf "====================\n\n"
 	printf "New ssh public key (%s): \n" "$HOME/.ssh/id_rsa.pub"
 	cat $HOME/.ssh/id_rsa.pub
+	command_summary $? 'valfur03 ssh key'
 fi
-command_summary $? 'valfur03 ssh key'
+ssh-add $HOME/.ssh/id_rsa > .last-output 2>&1
+command_summary $? 'ssh-add valfur03 key'
 if ! [ -f $HOME/.ssh/id_rsa_vfurmane ]
 then
 	printf "====================\n\n"
 	ssh-keygen -N "" -f $HOME/.ssh/id_rsa_vfurmane -q > .last-output 2>&1
 	printf "New ssh public key (%s): \n" "$HOME/.ssh/id_rsa_vfurmane.pub"
 	cat $HOME/.ssh/id_rsa_vfurmane.pub
+	command_summary $? 'vfurmane ssh key'
 fi
-command_summary $? 'vfurmane ssh key'
+ssh-add $HOME/.ssh/id_rsa_vfurmane > .last-output 2>&1
+command_summary $? 'ssh-add vfurmane key'
 
 rm -f .last-output
