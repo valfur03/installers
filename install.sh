@@ -170,27 +170,4 @@ mkdir -p $HOME/.config/terminator
 curl -fsSL -o $HOME/.config/terminator/config https://gist.githubusercontent.com/valfur03/f49e289c6f0b31c24fb167ec8fac461a/raw/terminator-config > .last-output 2>&1
 command_summary $? 'terminator config'
 
-# Configure SSH keys for GitHub
-mkdir -p $HOME/.ssh
-if ! [ -f $HOME/.ssh/id_rsa ]
-then
-	ssh-keygen -N "" -f $HOME/.ssh/id_rsa -q > .last-output 2>&1
-	printf "====================\n\n"
-	printf "New ssh public key (%s): \n" "$HOME/.ssh/id_rsa.pub"
-	cat $HOME/.ssh/id_rsa.pub
-	command_summary $? 'valfur03 ssh key'
-fi
-ssh-add $HOME/.ssh/id_rsa > .last-output 2>&1
-command_summary $? 'ssh-add valfur03 key'
-if ! [ -f $HOME/.ssh/id_rsa_vfurmane ]
-then
-	printf "====================\n\n"
-	ssh-keygen -N "" -f $HOME/.ssh/id_rsa_vfurmane -q > .last-output 2>&1
-	printf "New ssh public key (%s): \n" "$HOME/.ssh/id_rsa_vfurmane.pub"
-	cat $HOME/.ssh/id_rsa_vfurmane.pub
-	command_summary $? 'vfurmane ssh key'
-fi
-ssh-add $HOME/.ssh/id_rsa_vfurmane > .last-output 2>&1
-command_summary $? 'ssh-add vfurmane key'
-
 rm -f .last-output
